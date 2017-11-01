@@ -245,12 +245,16 @@ public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
                                                 Log.i("Link",link);
                                                 if (Profile.getCurrentProfile()!=null)
                                                 {
-                                                        Glide.with(getApplicationContext()).load(Profile.getCurrentProfile().getProfilePictureUri(200, 200))
-                                                                .thumbnail(0.5f)
-                                                                .crossFade()
-                                                                .diskCacheStrategy(DiskCacheStrategy.ALL)
-                                                                .into(UserPic);
-
+                                                        if(Profile.getCurrentProfile().getProfilePictureUri(200,200)==null) {
+                                                                UserPic.setImageResource(R.drawable.noic1);
+                                                        }
+                                                        else {
+                                                                Glide.with(getApplicationContext()).load(Profile.getCurrentProfile().getProfilePictureUri(200, 200))
+                                                                        .thumbnail(0.5f)
+                                                                        .crossFade()
+                                                                        .diskCacheStrategy(DiskCacheStrategy.ALL)
+                                                                        .into(UserPic);
+                                                        }
                                                 }
 
 
