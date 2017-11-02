@@ -35,11 +35,13 @@ import com.google.android.gms.common.api.Status;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.text.DateFormat;
 import java.util.Arrays;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener,
         GoogleApiClient.OnConnectionFailedListener {
-
+        Databasehelper dbhelp= new Databasehelper(this);
 private static final String TAG = MainActivity.class.getSimpleName();
 private static final int RC_SIGN_IN = 007;
 
@@ -117,6 +119,7 @@ private void signIn() {
         }
 
 private void signOut() {
+
         Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
                 new ResultCallback<Status>() {
                         @Override
@@ -124,6 +127,7 @@ private void signOut() {
                                 updateUI(false);
                         }
                 });
+
 }
 
 
@@ -134,12 +138,16 @@ public void onClick(View v) {
         int id = v.getId();
 
         switch (id) {
-        case R.id.gmail_signinbutton:
-        signIn();
-        break;
-                case R.id.gmail_sigoutbutton:
-                        signOut();
+                case R.id.gmail_signinbutton:
+                        signIn();
                         break;
+                case R.id.gmail_sigoutbutton:
+                {
+                        dbhelp.delete();
+                  signOut();
+
+                        break;
+                 }
                 case R.id.bnfb: {
                         LoginManager.getInstance().logInWithReadPermissions(MainActivity.this, Arrays.asList("public_profile", "user_friends","email"));
 
@@ -151,6 +159,7 @@ public void onClick(View v) {
                         bnfbl.setVisibility(View.GONE);
                         GmailSignInButton.setVisibility(View.VISIBLE);
                         bnfb.setVisibility(View.VISIBLE);
+                        dbhelp.delete();
                         break;
                 }
         }
@@ -170,6 +179,7 @@ private void handleSignInResult(GoogleSignInResult result) {
                 String Pic;
      UserName.setText(personName);
         Email.setText(email);
+
 if(acct.getPhotoUrl()==null) {
         UserPic.setImageResource(R.drawable.noic1);
 }
@@ -184,6 +194,8 @@ else
 }
                 Log.e(TAG, "Name: " + personName + ", email: " + email);
 
+                String time = DateFormat.getDateTimeInstance().format(new Date());
+                dbhelp.insert(personName,email,"Google",time);
         updateUI(true);
         } else {
         // Signed out, show unauthenticated UI.
@@ -240,6 +252,8 @@ public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
                                                 String id = profile.getId();
                                                 String link = profile.getLinkUri().toString();
                                                 String name = profile.getName();
+                                                String time = DateFormat.getDateTimeInstance().format(new Date());
+                                                dbhelp.insert(name,email,"Facebook",time);
                                                 LoginStatus.setText("Login Success : " + name + "\n"+ email);
                                                 UserPic.setVisibility(View.VISIBLE);
                                                 Log.i("Link",link);
