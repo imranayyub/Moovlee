@@ -3,6 +3,7 @@ package com.example.im.googlesign;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -42,82 +43,111 @@ import java.util.Date;
 public class MainActivity extends AppCompatActivity implements View.OnClickListener,
         GoogleApiClient.OnConnectionFailedListener {
         Databasehelper dbhelp= new Databasehelper(this);
+    contact c=new contact();
 private static final String TAG = MainActivity.class.getSimpleName();
 private static final int RC_SIGN_IN = 007;
-
-        CallbackManager callbackManager;
-
+     CallbackManager callbackManager;
 private GoogleApiClient mGoogleApiClient;
 private ProgressDialog mProgressDialog;
 private Button GmailSignInButton , gmail_sigoutbutton;
 private TextView LoginStatus,Email,UserName;
 private ImageView UserPic;
         Button bnfb, bnfbl;
-
-@Override
+int dec=0;
+    @Override
 protected void onCreate(Bundle savedInstanceState) {
         FacebookSdk.sdkInitialize(this.getApplicationContext());
-        super.onCreate(savedInstanceState);
+
+
+       super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // check login in DB
+        //// UserData userData = dbheelper.checkLogin();
+        // if existing login
+        // goto info
+       // gotoInfoscreen()
+        //else show login
+        //Read mvc and model
 
 
-        GmailSignInButton = (Button) findViewById(R.id.gmail_signinbutton);
-        gmail_sigoutbutton = (Button) findViewById(R.id.gmail_sigoutbutton);
-        LoginStatus = (TextView) findViewById(R.id.login_status);
-        UserName=(TextView)findViewById(R.id.UserName);
-        Email=(TextView)findViewById(R.id.UserEmail);
-        UserPic=(ImageView)findViewById(R.id.ProfilePic);
 
-        bnfb=(Button)findViewById(R.id.bnfb);
-        bnfb.setOnClickListener(this);
-        bnfbl=(Button)findViewById(R.id.bnfbl);
-        bnfbl.setOnClickListener(this);
+// initialize login UI
 
-        gmail_sigoutbutton.setOnClickListener(this);
+            GmailSignInButton = (Button) findViewById(R.id.gmail_signinbutton);
+            gmail_sigoutbutton = (Button) findViewById(R.id.gmail_sigoutbutton);
+            LoginStatus = (TextView) findViewById(R.id.login_status);
+            UserName = (TextView) findViewById(R.id.UserName);
+            Email = (TextView) findViewById(R.id.UserEmail);
+            UserPic = (ImageView) findViewById(R.id.ProfilePic);
 
-        GmailSignInButton.setOnClickListener(this);
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-        .requestEmail()
-        .build();
+            bnfb = (Button) findViewById(R.id.bnfb);
+            bnfb.setOnClickListener(this);
+            bnfbl = (Button) findViewById(R.id.bnfbl);
+            bnfbl.setOnClickListener(this);
+//applying onclick listener on the google signin and sign out buttons
 
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-        .enableAutoManage(this, this)
-        .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
-        .build();
+            gmail_sigoutbutton.setOnClickListener(this);
 
 
-        // fb begins
-        callbackManager = CallbackManager.Factory.create();
-        LoginManager.getInstance().registerCallback(callbackManager,
-                new FacebookCallback<LoginResult>() {
+            GmailSignInButton.setOnClickListener(this);
+            GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestEmail()
+                    .build();
+
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .enableAutoManage(this, this)
+                    .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
+                    .build();
+
+
+            // fb begins
+            callbackManager = CallbackManager.Factory.create();
+            LoginManager.getInstance().registerCallback(callbackManager,
+                    new FacebookCallback<LoginResult>() {
                         @Override
                         public void onSuccess(LoginResult loginResult) {
 
 //                        Status_view.setText("Login Success " + loginResult.getAccessToken().getUserId().toString() + "\n" + loginResult.getAccessToken().getToken().toString());
 
-                                setFacebookData(loginResult);
+                            setFacebookData(loginResult);
                         }
 
                         @Override
                         public void onCancel() {
-                                LoginStatus.setText("Login Cancelled");
+                            LoginStatus.setText(" FB Login Cancelled");
                         }
 
                         @Override
                         public void onError(FacebookException exception) {
-                                LoginStatus.setText("An Error Occured");
+                            LoginStatus.setText("An Error Occured(FB)");
                         }
-                });
+                    });
+
+        dec=dbhelp.checkLogin();
+        if(dec==1)
+        {
+            dbhelp.delete();
+            signIn();
+
+        }
+        else if(dec==2)
+        {
+            dbhelp.delete();
+            LoginManager.getInstance().logInWithReadPermissions(MainActivity.this, Arrays.asList("public_profile", "user_friends","email"));
+
+        }
 
 
 }
 
+
+//google sign in function
 private void signIn() {
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
         }
-
+//sign out  function for google
 private void signOut() {
 
         Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
@@ -132,7 +162,7 @@ private void signOut() {
 
 
 
-
+//on click function set the view according to the button being pressed
 @Override
 public void onClick(View v) {
         int id = v.getId();
@@ -165,8 +195,8 @@ public void onClick(View v) {
         }
         }
 
-
-private void handleSignInResult(GoogleSignInResult result) {
+//function to fetch the google log in data(Name , Email and profile) for current profile logged in
+public void handleSignInResult(GoogleSignInResult result) {
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
         // Signed in successfully, show authenticated UI.
@@ -179,7 +209,7 @@ private void handleSignInResult(GoogleSignInResult result) {
                 String Pic;
      UserName.setText(personName);
         Email.setText(email);
-
+//fetching profile photo with the help of glide
 if(acct.getPhotoUrl()==null) {
         UserPic.setImageResource(R.drawable.noic1);
 }
@@ -194,16 +224,23 @@ else
 }
                 Log.e(TAG, "Name: " + personName + ", email: " + email);
 
-                String time = DateFormat.getDateTimeInstance().format(new Date());
-                dbhelp.insert(personName,email,"Google",time);
+//Inserting details into database.
+                  c.setDate(DateFormat.getDateTimeInstance().format(new Date()).toString());
+                  c.setApp("Google");
+                  c.setName(personName);
+                  c.setEmail(email);
+                  dbhelp.insert(c);
+// in case of successful login change the UI to the present porfile pic, name, email.
         updateUI(true);
-        } else {
+        }
+        else {
         // Signed out, show unauthenticated UI.
         updateUI(false);
         }
+
         }
 
-private void updateUI(boolean isSignedIn) {
+public void updateUI(boolean isSignedIn) {
         if (isSignedIn) {
         GmailSignInButton.setVisibility(View.GONE);
         LoginStatus.setText("Login Success");
@@ -218,21 +255,20 @@ private void updateUI(boolean isSignedIn) {
                 gmail_sigoutbutton.setVisibility(View.GONE);
                 LoginStatus.setText("Status");
                         Email.setText("");
-
                 UserName.setText("");
-UserPic.setVisibility(View.GONE);
+                UserPic.setVisibility(View.GONE);
                 bnfb.setVisibility(View.VISIBLE);
         }
         }
-@Override
+
+
+        @Override
 public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         // An unresolvable error has occurred and Google APIs (including Sign-In) will not
         // be available.
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
         }
-
-
-
+    //facebook function to fetch data from crrent logged in profile.
         private void setFacebookData(LoginResult loginResult)
         {
                 GraphRequest request = GraphRequest.newMeRequest(
@@ -242,7 +278,8 @@ public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
                                 public void onCompleted(JSONObject object, GraphResponse response) {
                                         // Application code
                                         try {
-                                                Log.i("Response",response.toString());
+
+                                            Log.i("Response",response.toString());
                                                 GmailSignInButton.setVisibility(View.GONE);
                                                 gmail_sigoutbutton.setVisibility(View.GONE);
                                                 bnfb.setVisibility(View.GONE);
@@ -253,10 +290,17 @@ public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
                                                 String link = profile.getLinkUri().toString();
                                                 String name = profile.getName();
                                                 String time = DateFormat.getDateTimeInstance().format(new Date());
-                                                dbhelp.insert(name,email,"Facebook",time);
-                                                LoginStatus.setText("Login Success : " + name + "\n"+ email);
+                                           //INserting values in the database
+                                            c.setDate(time);
+                                            c.setApp("Facebook");
+                                            c.setName(name);
+                                            c.setEmail(email);
+                                            dbhelp.insert(c);
+
+                                            LoginStatus.setText("Login Success : " + name + "\n"+ email);
                                                 UserPic.setVisibility(View.VISIBLE);
                                                 Log.i("Link",link);
+                                     //fetching profile picusing glide
                                                 if (Profile.getCurrentProfile()!=null)
                                                 {
                                                         if(Profile.getCurrentProfile().getProfilePictureUri(200,200)==null) {
@@ -284,11 +328,11 @@ public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
                 request.executeAsync();
         }
 
-
+//receives result from the function being called in mainactivity
         @Override
         public void onActivityResult(int requestCode, int resultCode, Intent data) {
                 super.onActivityResult(requestCode, resultCode, data);
-
+              // check if the request code is same as what is passed
                         if(requestCode == RC_SIGN_IN) {
                                 GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
                                 handleSignInResult(result);
@@ -298,7 +342,7 @@ public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
                 }
         }
 
+
+
 }
-
-
 
