@@ -58,7 +58,7 @@ android:background="@drawable/bdarkbeach"
         android:drawableLeft="@drawable/googleicon"/>
 
     <Button
-        android:id="@+id/gmail_sigoutbutton"
+        android:id="@+id/gmail_Sigoutbutton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="340dp"
@@ -68,7 +68,7 @@ android:background="@drawable/bdarkbeach"
         android:layout_marginRight="30dp"
         android:visibility="invisible"/>
     <Button
-        android:id="@+id/bnfb"
+        android:id="@+id/fb_LoginButton"
         android:layout_width="match_parent"
         android:layout_height="35dp"
         android:text="Continue with Fb"
@@ -79,7 +79,7 @@ android:background="@drawable/bdarkbeach"
         android:drawableLeft="@drawable/fbbtn3"
         />
     <Button
-        android:id="@+id/bnfbl"
+        android:id="@+id/fb_LogoutButton"
         android:layout_width="match_parent"
         android:layout_height="35dp"
 android:layout_marginLeft="30dp"

@@ -5,11 +5,6 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.text.NoCopySpan;
-import android.util.Log;
-
-import java.io.IOException;
-import java.io.SyncFailedException;
 
 /**
  * Created by Im on 02-11-2017.
@@ -17,16 +12,16 @@ import java.io.SyncFailedException;
 
 public class Databasehelper extends SQLiteOpenHelper {
     SQLiteDatabase db;
-    contact c;
+    Contact c=new Contact();
     //defining database variables.
-    public static final String DATABASE_NAME = "contact.db";
+    public static final String DATABASE_NAME = "Contact.db";
     public static final int DATABASE_VERSION = 1;
-    public static final String TABLE_NAME = "contact";
+    public static final String TABLE_NAME = "Contact";
     public static final String COLUMN_EMAIL = "email";
     public static final String COLUMN_NAME = "name";
     public static final String COLUMN_TIME = "time";
     public static final String COLUMN_APP = "app";
-    public static final String TABLE_CREATE = "create table contact (NAME not null , EMAIL not null,APP not null,TIME not null);";
+    public static final String TABLE_CREATE = "create table Contact (NAME not null , EMAIL not null,APP not null,TIME not null);";
 
 
     String DB_PATH = null;
@@ -55,7 +50,7 @@ public class Databasehelper extends SQLiteOpenHelper {
 
     //insert data into the table.
 
-    public void insert(contact c) {
+    public void insert(Contact c) {
         db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put(COLUMN_EMAIL, c.getEmail());
@@ -71,32 +66,29 @@ public class Databasehelper extends SQLiteOpenHelper {
         db.execSQL(query);
     }
 
-    int dbz = 0;
+    int login_App = 0;
 
-    public int checkLogin() {
+    public Contact checkLogin() {
         db=this.getReadableDatabase();
 
-            String Query = "Select "+ COLUMN_APP+" from " + TABLE_NAME;
+            String Query = "Select * from " + TABLE_NAME;
 
             Cursor cursor = db.rawQuery(Query, null);
             cursor.moveToFirst();
         int count = cursor.getCount();
+        String login_app;
         if(count>0) {
             for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
-                String go = cursor.getString(cursor.getColumnIndex("APP"));
-                System.out.print(go);
-                if (go.equals("Google")) {
-                    dbz = 1;
-                  System.out.print(dbz);
-                }
-                    else if (go.equals("Facebook")) {
-                    dbz = 2;
-                    System.out.print(dbz);
+                login_app = cursor.getString(cursor.getColumnIndex("APP"));
+                c.setApp(login_app);
 
                 }
-                }
         }
-        return dbz;
+        if(count==0)
+        {
+            c.setApp("null");
+        }
+        return c;
     }
 
 }

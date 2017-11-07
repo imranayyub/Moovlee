@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity;
  * Created by Im on 04-11-2017.
  */
 
-public class contact  {
+public class Contact {
     String email,name,date,app;
     public  void setName(String name)
     {
