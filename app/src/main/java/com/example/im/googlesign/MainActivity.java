@@ -1,13 +1,18 @@
 package com.example.im.googlesign;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -38,6 +43,9 @@ import com.google.android.gms.common.api.Status;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -56,8 +64,9 @@ private ProgressDialog mProgressDialog;
 private Button gmailSignInButton , gmail_Sigoutbutton;
 private TextView loginStatus,email,userName;
 private ImageView userPic;
-        Button fb_LoginButton, fb_LogoutButton;
-int loginApp=0;
+        Button fb_LoginButton, fb_LogoutButton,SelectImageButton;
+int req=1;
+
     @Override
 protected void onCreate(Bundle savedInstanceState) {
         FacebookSdk.sdkInitialize(this.getApplicationContext());
@@ -78,7 +87,7 @@ protected void onCreate(Bundle savedInstanceState) {
 
 
 // initialize login UI
-
+        SelectImageButton  = (Button) findViewById(R.id.SelectImageButton);
             gmailSignInButton = (Button) findViewById(R.id.gmail_signinbutton);
             gmail_Sigoutbutton = (Button) findViewById(R.id.gmail_Sigoutbutton);
             loginStatus = (TextView) findViewById(R.id.login_status);
@@ -90,13 +99,16 @@ protected void onCreate(Bundle savedInstanceState) {
             fb_LoginButton.setOnClickListener(this);
             fb_LogoutButton = (Button) findViewById(R.id.fb_LogoutButton);
             fb_LogoutButton.setOnClickListener(this);
+
+
+        SelectImageButton.setOnClickListener(this);
+
 //applying onclick listener on the google signin and sign out buttons
+
 
             gmail_Sigoutbutton.setOnClickListener(this);
 
-
-
-            gmailSignInButton.setOnClickListener(this);
+        gmailSignInButton.setOnClickListener(this);
             GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                     .requestEmail()
                     .build();
@@ -193,16 +205,24 @@ public void onClick(View v) {
                         LoginManager.getInstance().logInWithReadPermissions(MainActivity.this, Arrays.asList("public_profile", "user_friends","email"));
 
                         break;
-                }                case R.id.fb_LogoutButton: {
+                }
+                case R.id.fb_LogoutButton: {
                         LoginManager.getInstance().logOut();
                         loginStatus.setText("Status");
                         userPic.setVisibility(View.GONE);
                         fb_LogoutButton.setVisibility(View.GONE);
                         gmailSignInButton.setVisibility(View.VISIBLE);
-                        fb_LoginButton.setVisibility(View.VISIBLE);
+                    SelectImageButton.setVisibility(View.GONE);
+
+                    fb_LoginButton.setVisibility(View.VISIBLE);
                         dbhelp.delete();
                         break;
                 }
+            case R.id.SelectImageButton:
+            {
+                openFileManager();
+            }
+
         }
         }
     ConnectionResult connectionResult;
@@ -277,7 +297,7 @@ public void updateUI(boolean isSignedIn) {
                 userPic.setVisibility(View.VISIBLE);
                  fb_LoginButton.setVisibility(View.GONE);
                 fb_LogoutButton.setVisibility(View.GONE);
-
+            SelectImageButton.setVisibility(View.VISIBLE);
         } else {
 
         gmailSignInButton.setVisibility(View.VISIBLE);
@@ -286,7 +306,8 @@ public void updateUI(boolean isSignedIn) {
                         email.setText("");
                 userName.setText("");
                 userPic.setVisibility(View.GONE);
-                fb_LoginButton.setVisibility(View.VISIBLE);
+            SelectImageButton.setVisibility(View.GONE);
+            fb_LoginButton.setVisibility(View.VISIBLE);
         }
         }
 
@@ -320,6 +341,7 @@ public void updateUI(boolean isSignedIn) {
                                             c.setName(name);
                                             c.setEmail(email);
                                             dbhelp.insert(c);
+                                            SelectImageButton.setVisibility(View.VISIBLE);
 
                                             loginStatus.setText("Login Success : " + name + "\n"+ email);
                                                 userPic.setVisibility(View.VISIBLE);
@@ -364,6 +386,23 @@ public void updateUI(boolean isSignedIn) {
                 if (callbackManager.onActivityResult(requestCode, resultCode, data)) {
                         return;
                 }
+                //for file manager's result
+//            if (requestCode == req && resultCode == Activity.RESULT_OK) {
+//                if (data == null) {
+//                    //Display an error
+//                    return;
+//                }
+//
+//
+//                try {
+//                    InputStream inputStream =this.getContentResolver().openInputStream(data.getData());
+//                    decodeBase64(inputStream.toString());
+//                } catch (FileNotFoundException e) {
+//                    e.printStackTrace();
+//                }
+
+                //Now you can do whatever you want with your inpustream, save it as file, upload to a server, decode a bitmap...
+//            }
         }
 
         boolean connected=false;
@@ -385,6 +424,34 @@ else {
         }
       return connected;
      }
+//Accesses the file explorer of phone to select image
+void openFileManager()
+{
+    Intent intent = new Intent();
+    intent.setAction(Intent.ACTION_GET_CONTENT);
+    intent.setType("image/*");
+    startActivityForResult(intent, req);
 
+}
+//    public static String encodeTobase64(Bitmap image)
+//    {
+//        Bitmap immagex=image;
+//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        immagex.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+//        byte[] b = baos.toByteArray();
+//        String imageEncoded = Base64.encodeToString(b,Base64.DEFAULT);
+//
+//        Log.e("LOOK", imageEncoded);
+//        return imageEncoded;
+//    }
+//    public static Bitmap decodeBase64(String input)
+//    {
+//        byte[] decodedByte = Base64.decode(input, 0);
+//        return BitmapFactory.decodeByteArray(decodedByte, 0, decodedByte.length);
+//
+//    }
+
+    
+//    READ XML STORAGE ANDWRITE XML STORAGE PERMISSIONS IN MANIFEST
 }
 
