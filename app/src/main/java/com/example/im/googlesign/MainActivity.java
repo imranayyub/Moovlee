@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -46,6 +47,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
+import java.net.URI;
 import java.text.DateFormat;
 import java.util.Arrays;
 import java.util.Date;
@@ -65,7 +67,6 @@ private Button gmailSignInButton , gmail_Sigoutbutton;
 private TextView loginStatus,email,userName;
 private ImageView userPic;
         Button fb_LoginButton, fb_LogoutButton,SelectImageButton;
-int req=1;
 
     @Override
 protected void onCreate(Bundle savedInstanceState) {
@@ -220,7 +221,9 @@ public void onClick(View v) {
                 }
             case R.id.SelectImageButton:
             {
-                openFileManager();
+                Intent intent = new Intent(MainActivity.this, DisplayImage.class);
+                startActivity(intent);
+//                openFileManager();
             }
 
         }
@@ -377,33 +380,18 @@ public void updateUI(boolean isSignedIn) {
 //receives result from the function being called in mainactivity
         @Override
         public void onActivityResult(int requestCode, int resultCode, Intent data) {
-                super.onActivityResult(requestCode, resultCode, data);
-              // check if the request code is same as what is passed
-                        if(requestCode == RC_SIGN_IN) {
-                                GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-                                handleSignInResult(result);
-                        }
-                if (callbackManager.onActivityResult(requestCode, resultCode, data)) {
-                        return;
-                }
-                //for file manager's result
-//            if (requestCode == req && resultCode == Activity.RESULT_OK) {
-//                if (data == null) {
-//                    //Display an error
-//                    return;
-//                }
-//
-//
-//                try {
-//                    InputStream inputStream =this.getContentResolver().openInputStream(data.getData());
-//                    decodeBase64(inputStream.toString());
-//                } catch (FileNotFoundException e) {
-//                    e.printStackTrace();
-//                }
+            super.onActivityResult(requestCode, resultCode, data);
+            // check if the request code is same as what is passed
+            if (requestCode == RC_SIGN_IN) {
+                GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+                handleSignInResult(result);
+            }
+            if (callbackManager.onActivityResult(requestCode, resultCode, data)) {
+                return;
+            }
+            //for file manager's result
 
-                //Now you can do whatever you want with your inpustream, save it as file, upload to a server, decode a bitmap...
-//            }
-        }
+            }
 
         boolean connected=false;
     private boolean isNetworkAvailable() {
@@ -425,14 +413,7 @@ else {
       return connected;
      }
 //Accesses the file explorer of phone to select image
-void openFileManager()
-{
-    Intent intent = new Intent();
-    intent.setAction(Intent.ACTION_GET_CONTENT);
-    intent.setType("image/*");
-    startActivityForResult(intent, req);
 
-}
 //    public static String encodeTobase64(Bitmap image)
 //    {
 //        Bitmap immagex=image;
@@ -451,7 +432,7 @@ void openFileManager()
 //
 //    }
 
-    
+
 //    READ XML STORAGE ANDWRITE XML STORAGE PERMISSIONS IN MANIFEST
 }
 
