@@ -67,7 +67,7 @@ private Button gmailSignInButton , gmail_Sigoutbutton;
 private TextView loginStatus,email,userName;
 private ImageView userPic;
         Button fb_LoginButton, fb_LogoutButton,SelectImageButton;
-
+//    DisplayImage displayImage=new DisplayImage();
     @Override
 protected void onCreate(Bundle savedInstanceState) {
         FacebookSdk.sdkInitialize(this.getApplicationContext());
@@ -223,7 +223,9 @@ public void onClick(View v) {
             {
                 Intent intent = new Intent(MainActivity.this, DisplayImage.class);
                 startActivity(intent);
-//                openFileManager();
+//                displayImage.openFileManager();
+
+
             }
 
         }

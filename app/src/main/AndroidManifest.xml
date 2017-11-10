@@ -20,7 +20,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".DisplayImage" />
-        <!--<activity android:name=".FragmentActivity" />-->
+        <!--<activity android:name=".ImageDisplayFragment" />-->
         <meta-data android:name="com.facebook.sdk.ApplicationId"
             android:value="@string/facebook_app_id"/>
     </application>
