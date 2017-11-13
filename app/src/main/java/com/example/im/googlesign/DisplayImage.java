@@ -3,9 +3,16 @@ package com.example.im.googlesign;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.app.assist.AssistContent;
+import android.content.ClipData;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.support.annotation.RequiresApi;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -20,34 +27,36 @@ import java.util.List;
  * Created by Im on 09-11-2017.
  */
 
-public class DisplayImage extends AppCompatActivity implements View.OnClickListener{
+public class DisplayImage extends AppCompatActivity implements View.OnClickListener {
     int req = 1;
-    FragmentManager manager=getFragmentManager();
-   ImageDisplayFragment fragmentActivity=new ImageDisplayFragment();
+    FragmentManager manager = getFragmentManager();
+    ImageDisplayFragment fragmentActivity = new ImageDisplayFragment();
     Button SelectImageButton1;
+    ViewPager viewPager;
+    MyCustomPagerAdapter myCustomPagerAdapter;
     //ImageView image;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_displayimage);
-        SelectImageButton1=(Button)findViewById(R.id.SelectImageButton1);
+        SelectImageButton1 = (Button) findViewById(R.id.SelectImageButton1);
 
         SelectImageButton1.setOnClickListener(this);
-//        image=(ImageView)findViewById(R.id.image);
+        viewPager = (ViewPager)findViewById(R.id.viewPager);
 
     }
 
     @Override
     public void onClick(View v) {
-        int id =v.getId();
-        switch (id){
-            case R.id.SelectImageButton1 :
-                FragmentTransaction transaction=manager.beginTransaction();
+        int id = v.getId();
+        switch (id) {
+            case R.id.SelectImageButton1:
+                FragmentTransaction transaction = manager.beginTransaction();
 
                 transaction.replace(R.id.fragmentActivity, fragmentActivity).commit();
                 transaction.show(fragmentActivity);
 
-                ImageDisplayFragment f1= (ImageDisplayFragment) manager.findFragmentById(R.id.fragmentActivity);
+                ImageDisplayFragment f1 = (ImageDisplayFragment) manager.findFragmentById(R.id.fragmentActivity);
                 f1.state("IMAGE!");
                 openFileManager();
 
@@ -61,9 +70,11 @@ public class DisplayImage extends AppCompatActivity implements View.OnClickListe
         intent.setAction(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
         startActivityForResult(intent, req);
+//        ArrayList<String> marray= getAllShownImagesPath(this);
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -73,34 +84,24 @@ public class DisplayImage extends AppCompatActivity implements View.OnClickListe
                 //Display an error
                 return;
             }
-//
-//
-//            String [] max={};
-//            ArrayList<Uri> mArrayUri = new ArrayList<Uri>();
-            Uri imageUri = data.getData();
-            try {
+            ArrayList<String> imagearray = new ArrayList<>();
+            ClipData clipData = data.getClipData();
+            if (clipData != null) {
+                for (int i = 0; i < clipData.getItemCount(); i++) {
+                    ClipData.Item item = clipData.getItemAt(i);
+                    Uri uri = item.getUri();
 
-                InputStream inputStream = this.getContentResolver().openInputStream(imageUri);
-                ImageDisplayFragment f1= (ImageDisplayFragment) manager.findFragmentById(R.id.fragmentActivity);
-                f1.showImage(imageUri.toString());
-
-
-
-
-//
-//                Glide.with(getApplicationContext()).load(imageUri.toString())
-//                        .thumbnail(0.5f)
-//                        .crossFade()
-//                        .diskCacheStrategy(DiskCacheStrategy.ALL)
-//                        .into(image);
-
-            } catch (FileNotFoundException e) {
-                Toast.makeText(this, "Unable to open image  ", Toast.LENGTH_LONG).show();
-                e.printStackTrace();
+                    imagearray.add(i, uri.toString());
+                }
+                ImageDisplayFragment f1 = (ImageDisplayFragment) manager.findFragmentById(R.id.fragmentActivity);
+                f1.showImage(imagearray.get(1).toString());
+                myCustomPagerAdapter = new MyCustomPagerAdapter(DisplayImage.this, imagearray);
+                viewPager.setAdapter(myCustomPagerAdapter);
 
             }
-
-            //Now you can do whatever you want with your inpustream, save it as file, upload to a server, decode a bitmap...
         }
     }
 }
+
+
+//Dialogue fragment  to get more details from user

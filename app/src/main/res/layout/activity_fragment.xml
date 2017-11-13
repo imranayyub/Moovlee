@@ -6,12 +6,12 @@
     android:id="@+id/fragmentActivity">
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="20dp"
         android:text="Fragment 1"
         android:id="@+id/text"/>
    <ImageView
        android:layout_width="match_parent"
-      android:layout_marginTop="100dp"
+      android:layout_marginTop="25dp"
        android:layout_height="300dp"
        android:id="@+id/image1"/>
 
