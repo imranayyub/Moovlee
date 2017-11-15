@@ -5,6 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.widget.Toast;
+
+import static com.facebook.FacebookSdk.getApplicationContext;
 
 /**
  * Created by Im on 02-11-2017.
@@ -21,7 +24,10 @@ public class Databasehelper extends SQLiteOpenHelper {
     public static final String COLUMN_NAME = "name";
     public static final String COLUMN_TIME = "time";
     public static final String COLUMN_APP = "app";
-    public static final String TABLE_CREATE = "create table Contact (NAME not null , EMAIL not null,APP not null,TIME not null);";
+    public static final String COLUMN_FNAME= "fname";
+    public static final String COLUMN_ADDRESS = "address";
+
+    public static final String TABLE_CREATE = "create table Contact (NAME not null , EMAIL not null,APP not null,TIME not null,FNAME,ADDRESS);";
 
 
     String DB_PATH = null;
@@ -51,13 +57,21 @@ public class Databasehelper extends SQLiteOpenHelper {
     //insert data into the table.
 
     public void insert(Contact c) {
-        db = this.getWritableDatabase();
-        ContentValues values = new ContentValues();
-        values.put(COLUMN_EMAIL, c.getEmail());
-        values.put(COLUMN_NAME, c.getName());
-        values.put(COLUMN_APP, c.getApp());
-        values.put(COLUMN_TIME, c.getDate());
-        db.insert(TABLE_NAME, null, values);
+       try {
+
+
+           db = this.getWritableDatabase();
+           ContentValues values = new ContentValues();
+           values.put(COLUMN_EMAIL, c.getEmail());
+           values.put(COLUMN_NAME, c.getName());
+           values.put(COLUMN_APP, c.getApp());
+           values.put(COLUMN_TIME, c.getDate());
+           values.put(COLUMN_FNAME, c.getFname());
+           values.put(COLUMN_ADDRESS, c.getAddress());
+           db.insert(TABLE_NAME, null, values);
+       }catch(Exception e) {
+           e.printStackTrace();
+       }
     }
 
     // Deletes all the data present currently in database.
@@ -66,7 +80,6 @@ public class Databasehelper extends SQLiteOpenHelper {
         db.execSQL(query);
     }
 
-    int login_App = 0;
 
     public Contact checkLogin() {
         db=this.getReadableDatabase();
@@ -76,17 +89,25 @@ public class Databasehelper extends SQLiteOpenHelper {
             Cursor cursor = db.rawQuery(Query, null);
             cursor.moveToFirst();
         int count = cursor.getCount();
-        String login_app;
+        String login_app,father,address;
+
         if(count>0) {
             for (cursor.moveToFirst(); !cursor.isAfterLast(); cursor.moveToNext()) {
                 login_app = cursor.getString(cursor.getColumnIndex("APP"));
                 c.setApp(login_app);
+                father = cursor.getString(cursor.getColumnIndex("FNAME"));
+                c.setFname(father);
+                address = cursor.getString(cursor.getColumnIndex("ADDRESS"));
+                c.setAddress(address);
 
                 }
         }
         if(count==0)
         {
             c.setApp("null");
+            c.setAddress("");
+            c.setAddress("");
+
         }
         return c;
     }

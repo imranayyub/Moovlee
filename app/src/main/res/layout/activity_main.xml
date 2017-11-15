@@ -37,6 +37,15 @@
         android:layout_marginTop="80dp"
         android:textColor="#e7dfe0"
         android:textStyle="bold" />
+    <TextView
+        android:layout_marginTop="170dp"
+        android:layout_width="match_parent"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_height="wrap_content"
+        android:id="@+id/text"
+        android:textColor="#e7dfe0"
+        />
 
     <TextView
         android:id="@+id/UserEmail"
@@ -47,6 +56,16 @@
         android:textColor="#e7dfe0"
         android:textStyle="bold" />
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/infoButton"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="300dp"
+        android:text="enter more information"
+        android:visibility="invisible"
+        />
     <Button
         android:id="@+id/gmail_signinbutton"
         android:layout_width="match_parent"

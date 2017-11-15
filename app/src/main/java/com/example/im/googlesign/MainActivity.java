@@ -1,6 +1,7 @@
 package com.example.im.googlesign;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -67,7 +68,13 @@ private Button gmailSignInButton , gmail_Sigoutbutton;
 private TextView loginStatus,email,userName;
 private ImageView userPic;
         Button fb_LoginButton, fb_LogoutButton,SelectImageButton;
-//    DisplayImage displayImage=new DisplayImage();
+
+
+    FragmentManager manager=getFragmentManager();
+    dialogFragment dialog = new dialogFragment();
+    Button infoButton;
+    String fname="",address="";
+    TextView text;
     @Override
 protected void onCreate(Bundle savedInstanceState) {
         FacebookSdk.sdkInitialize(this.getApplicationContext());
@@ -85,7 +92,9 @@ protected void onCreate(Bundle savedInstanceState) {
         //else show login
         //Read mvc and model
 
-
+        infoButton= (Button) findViewById(R.id.infoButton);
+        infoButton.setOnClickListener(this);
+        text= (TextView) findViewById(R.id.text);
 
 // initialize login UI
         SelectImageButton  = (Button) findViewById(R.id.SelectImageButton);
@@ -146,15 +155,30 @@ protected void onCreate(Bundle savedInstanceState) {
         c=dbhelp.checkLogin();
         if(c.getApp().equals("Google"))
         {
+            if(!c.getAddress().isEmpty())
+            {
+                fname=c.getFname();
+                address=c.getAddress();
+                text.setText("Father's Name : "+ fname+"\n Address : "+address);
+
+            }
             dbhelp.delete();
             signIn();
+            infoButton.setVisibility(View.GONE);
 
         }
         else if(c.getApp().equals("Facebook"))
         {
+            if(!c.getAddress().isEmpty())
+            {
+                fname=c.getFname();
+                address=c.getAddress();
+                text.setText("Father's Name : "+ fname+"\n Address : "+address);
+
+            }
             dbhelp.delete();
             LoginManager.getInstance().logInWithReadPermissions(MainActivity.this, Arrays.asList("public_profile", "user_friends","email"));
-
+            infoButton.setVisibility(View.GONE);
         }
 
 
@@ -198,6 +222,7 @@ public void onClick(View v) {
                 case R.id.gmail_Sigoutbutton:
                 {
                         dbhelp.delete();
+                    infoButton.setVisibility(View.GONE);
                   signOut();
 
                         break;
@@ -210,10 +235,14 @@ public void onClick(View v) {
                 case R.id.fb_LogoutButton: {
                         LoginManager.getInstance().logOut();
                         loginStatus.setText("Status");
+                    text.setText("");
+                    userName.setText("");
+                    email.setText("");
                         userPic.setVisibility(View.GONE);
                         fb_LogoutButton.setVisibility(View.GONE);
                         gmailSignInButton.setVisibility(View.VISIBLE);
                     SelectImageButton.setVisibility(View.GONE);
+                    infoButton.setVisibility(View.INVISIBLE);
 
                     fb_LoginButton.setVisibility(View.VISIBLE);
                         dbhelp.delete();
@@ -224,8 +253,12 @@ public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, DisplayImage.class);
                 startActivity(intent);
 //                displayImage.openFileManager();
-
-
+                break;
+            }
+            case R.id.infoButton: {
+                dialog.show(manager, "YourDialog");
+//                showtext();
+                break;
             }
 
         }
@@ -303,6 +336,7 @@ public void updateUI(boolean isSignedIn) {
                  fb_LoginButton.setVisibility(View.GONE);
                 fb_LogoutButton.setVisibility(View.GONE);
             SelectImageButton.setVisibility(View.VISIBLE);
+            infoButton.setVisibility(View.VISIBLE);
         } else {
 
         gmailSignInButton.setVisibility(View.VISIBLE);
@@ -311,8 +345,10 @@ public void updateUI(boolean isSignedIn) {
                         email.setText("");
                 userName.setText("");
                 userPic.setVisibility(View.GONE);
+            text.setText("");
             SelectImageButton.setVisibility(View.GONE);
             fb_LoginButton.setVisibility(View.VISIBLE);
+            infoButton.setVisibility(View.GONE);
         }
         }
 
@@ -334,7 +370,8 @@ public void updateUI(boolean isSignedIn) {
                                                 gmail_Sigoutbutton.setVisibility(View.GONE);
                                                 fb_LoginButton.setVisibility(View.GONE);
                                                 fb_LogoutButton.setVisibility(View.VISIBLE);
-                                                String email = response.getJSONObject().getString("email");
+                                            infoButton.setVisibility(View.VISIBLE);
+                                                String emails = response.getJSONObject().getString("email");
                                                 Profile profile = Profile.getCurrentProfile();
                                                 String id = profile.getId();
                                                 String link = profile.getLinkUri().toString();
@@ -344,11 +381,13 @@ public void updateUI(boolean isSignedIn) {
                                             c.setDate(time);
                                             c.setApp("Facebook");
                                             c.setName(name);
-                                            c.setEmail(email);
+                                            c.setEmail(emails);
                                             dbhelp.insert(c);
                                             SelectImageButton.setVisibility(View.VISIBLE);
 
-                                            loginStatus.setText("Login Success : " + name + "\n"+ email);
+                                            loginStatus.setText("Login Success : " );
+                                            userName.setText(name);
+                                            email.setText(emails);
                                                 userPic.setVisibility(View.VISIBLE);
                                                 Log.i("Link",link);
                                      //fetching profile picusing glide
@@ -436,5 +475,15 @@ else {
 
 
 //    READ XML STORAGE ANDWRITE XML STORAGE PERMISSIONS IN MANIFEST
+
+    public void showtext(String fname, String address)
+    {
+        text.setText("Father's Name : "+ fname+"\n Address : "+address);
+//        dbhelp.delete();
+        c.setAddress(address);
+        c.setFname(fname);
+        dbhelp.insert(c);
+        infoButton.setVisibility(View.GONE);
+    }
 }
 

@@ -7,7 +7,7 @@ import android.support.v7.app.AppCompatActivity;
  */
 
 public class Contact {
-    String email,name,date,app;
+    String email,name,date,app,fname,address;
     public  void setName(String name)
     {
         this.name=name;
@@ -24,7 +24,14 @@ public class Contact {
     {
         this.app=app;
     }
-
+    public  void setAddress(String address)
+    {
+        this.address=address;
+    }
+    public  void setFname(String fname)
+    {
+        this.fname=fname;
+    }
 public String getName()
 {
     return this.name;
@@ -39,6 +46,14 @@ public String getDate()
     public String getApp()
     {
         return this.app;
+    }
+    public String getFname()
+    {
+        return this.fname;
+    }
+    public String getAddress()
+    {
+        return this.address;
     }
 
 }
