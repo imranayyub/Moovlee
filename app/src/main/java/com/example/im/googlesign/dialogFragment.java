@@ -15,7 +15,7 @@ import android.widget.Toast;
  * Created by Im on 14-11-2017.
  */
 
-public class dialogFragment extends DialogFragment implements View.OnClickListener ,android.text.TextWatcher {
+public class dialogFragment extends DialogFragment implements View.OnClickListener, android.text.TextWatcher {
     Button ok, cancel;
     EditText fName, address;
     private String fnames;
@@ -23,6 +23,7 @@ public class dialogFragment extends DialogFragment implements View.OnClickListen
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+       //Inflating the dialogfragment layout
         View rootView = inflater.inflate(R.layout.dialogfragment, container, false);
         ok = (Button) rootView.findViewById(R.id.ok);
         cancel = (Button) rootView.findViewById(R.id.cancel);
@@ -31,37 +32,31 @@ public class dialogFragment extends DialogFragment implements View.OnClickListen
 
         ok.setOnClickListener(this);
         cancel.setOnClickListener(this);
+        //Applying asstextChangedListener on the EditTexts so that can validate data entered in EditText.
         fName.addTextChangedListener(this);
         address.addTextChangedListener(this);
-        getDialog().setTitle("Enter Some More Info.");
+        getDialog().setTitle("Enter Some More Info."); //Sets title of Dialog Fragment.
         getDialog().setCancelable(false);
+        ok.setEnabled(false);
         return rootView;
     }
 
     @Override
     public void onClick(View view) {
-
-
         int id = view.getId();
         switch (id) {
             case R.id.ok: {
-
+                //Retrieves data from EditText.
                 fnames = fName.getText().toString();
-
                 useraddress = address.getText().toString();
-//                validate(fnames);
-//                validate(useraddress);
-
-//               MainActivity.showtext(fatherName,userAdress);
                 Toast.makeText(getActivity(), "Ok button is Clicked", Toast.LENGTH_SHORT).show();
+
                 MainActivity callingActivity = (MainActivity) getActivity();
-                callingActivity.showtext(fName.getText().toString(), address.getText().toString());
-//                setfname(fName.getText().toString());
-//                setaddress(address.getText().toString());
+                callingActivity.showtext(fName.getText().toString(), address.getText().toString()); //calls Function from MainActivity.
+                 //Sets EditTexts Empty.
                 ((EditText) fName.findViewById(R.id.fName)).setText("");
                 ((EditText) address.findViewById(R.id.address)).setText("");
-                dismiss();
-
+                dismiss(); //Dismisses the Dialog Fragment.
                 break;
             }
             case R.id.cancel: {
@@ -84,7 +79,7 @@ public class dialogFragment extends DialogFragment implements View.OnClickListen
     public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
 
     }
-
+    //Check the Validation of input in Edittexts.
     @Override
     public void afterTextChanged(Editable s) {
         fnames = fName.getText().toString();
@@ -97,6 +92,5 @@ public class dialogFragment extends DialogFragment implements View.OnClickListen
             ok.setEnabled(false);
         } else
             ok.setEnabled(true);
-// validation code goes here
     }
 }

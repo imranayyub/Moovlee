@@ -24,16 +24,16 @@ public class MyCustomPagerAdapter extends PagerAdapter {
     ArrayList<String> images;
     LayoutInflater layoutInflater;
 
-
+    // Initializing Constructor
     public MyCustomPagerAdapter(Context context, ArrayList<String> images) {
         this.context = context;
-        this.images =  images;
+        this.images = images;
         layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
     }
 
+    //Return the size of the ArrayList images.
     @Override
     public int getCount() {
-
         return images.size();
     }
 
@@ -44,29 +44,27 @@ public class MyCustomPagerAdapter extends PagerAdapter {
 
     @Override
     public Object instantiateItem(ViewGroup container, final int position) {
-        LinearLayout itemView = (LinearLayout)layoutInflater.inflate(R.layout.item, container, false);
-
+        LinearLayout itemView = (LinearLayout) layoutInflater.inflate(R.layout.item, container, false);
         ImageView imageView = (ImageView) itemView.findViewById(R.id.imageView);
         Glide.with(getApplicationContext()).load(images.get(position).toString())
                 .thumbnail(0.5f)
                 .crossFade()
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
-                .into((ImageView)itemView.findViewById(R.id.imageView));
+                .into((ImageView) itemView.findViewById(R.id.imageView));
         container.addView(itemView);
 
         //listening to image click
         imageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(context, "you clicked image " + (position + 1), Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "you clicked image " + (position + 1), Toast.LENGTH_SHORT).show();
             }
         });
 
         return itemView;
     }
-
+    //Destroys the view.
     @Override
-
     public void destroyItem(ViewGroup container, int position, Object object) {
         container.removeView((LinearLayout) object);
     }

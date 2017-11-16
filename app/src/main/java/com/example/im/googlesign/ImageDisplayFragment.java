@@ -16,7 +16,6 @@ import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import java.io.InputStream;
 
 
-
 import static com.facebook.FacebookSdk.getApplicationContext;
 
 /**
@@ -25,42 +24,32 @@ import static com.facebook.FacebookSdk.getApplicationContext;
 
 public class ImageDisplayFragment extends Fragment {
     ImageView image;
-//DisplayImage displayImage=new DisplayImage();
-TextView text;
+    TextView text;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        return inflater.inflate(R.layout.activity_fragment,container,false);
-
-
+        return inflater.inflate(R.layout.activity_fragment, container, false);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        image= (ImageView)getActivity().findViewById(R.id.image1);
-text= (TextView) getActivity().findViewById(R.id.text);
+        image = (ImageView) getActivity().findViewById(R.id.image1);
+        text = (TextView) getActivity().findViewById(R.id.text);
+    }
+    //ShowImage Function displays Image with the help of Glide
+    public void showImage(String s) {
+
+        Glide.with(getApplicationContext()).load(s)
+                .thumbnail(0.5f)
+                .crossFade()
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
+                .into((ImageView) getActivity().findViewById(R.id.image1));
+
     }
 
-//    @Override
-//    public void onAttach(Activity activity) {
-//        super.onAttach(activity);
-////        image= (ImageView)getActivity().findViewById(R.id.image1);
-//
-//    }
-
-    public void showImage(String s)
-    {
-
-            Glide.with(getApplicationContext()).load(s)
-                    .thumbnail(0.5f)
-                    .crossFade()
-                    .diskCacheStrategy(DiskCacheStrategy.ALL)
-                    .into((ImageView)getActivity().findViewById(R.id.image1));
-
-    }
-    public void state(String s){
+    public void state(String s) {
         text.setText(s);
     }
 }
-//support fragment manager
